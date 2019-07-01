@@ -4,7 +4,7 @@ function foo() {
     return (new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve("done!");   // passing argument is optional, can just use resolve()
-        }, 20000)   // specify the delay time in ms here..
+        }, 500)   // specify the delay time in ms here..
     }))
 }
 
