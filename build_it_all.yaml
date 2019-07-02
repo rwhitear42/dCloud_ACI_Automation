@@ -76,7 +76,7 @@
 #
 
 - name:               Build APIC Configuration from Scratch
-  hosts:              apic-simulator
+  hosts:              apic_simulator
   connection:         local
   gather_facts:       no
   vars:
@@ -326,6 +326,8 @@
             status: created,modified
     with_items:
       "{{ifPolicyLeafProfileNames}}"
+    loop_control:
+      pause: .5
 
   # Create Switch Policy Leaf Profiles
   - name:             Create Switch Policy Leaf Profiles
@@ -371,3 +373,5 @@
                     to_: "{{item.leafId}}"
     with_items:
       "{{swPolicyLeafProfiles}}"
+    loop_control:
+      pause: .5
