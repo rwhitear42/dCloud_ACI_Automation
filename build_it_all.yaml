@@ -76,7 +76,7 @@
 #
 
 - name:               Build APIC Configuration from Scratch
-  hosts:              all
+  hosts:              apic_simulator
   connection:         local
   gather_facts:       no
   vars:
@@ -157,6 +157,65 @@
     - swPolicyLeafProfileName: Leafs_105_and_106
       leafName: Leaf-106
       leafId: '106'
+
+    vrfs:
+    - tenantName: common
+      vrfName: vrf-01
+
+    bridgeDomains:
+    - bdName: 192.168.100.0_24
+      tenantName: common
+      vrfName: vrf-01
+    - bdName: 192.168.101.0_24
+      tenantName: common
+      vrfName: vrf-01
+
+    bdSubnets:
+    - bdName: 192.168.100.0_24
+      tenantName: common
+      gwAddress: 192.168.100.1
+      mask: 24
+    - bdName: 192.168.101.0_24
+      tenantName: common
+      gwAddress: 192.168.101.1
+      mask: 24
+
+    tenants:
+    - tenantName: Demo
+
+    appProfiles:
+    - apName: WordPress
+      tenantName: Demo
+
+    epgs:
+    - epgName: WebServers
+      tenantName: Demo
+      apName: WordPress
+      bdName: 192.168.100.0_24
+    - epgName: DbServers
+      tenantName: Demo
+      apName: WordPress
+      bdName: 192.168.101.0_24
+
+    staticPorts:
+    - nodeID: 101
+      path: eth1/11
+      vlanID: 2011
+      tenantName: Demo
+      apName: WordPress
+      epgName: WebServers
+    - nodeID: 101
+      path: eth1/12
+      vlanID: 2012
+      tenantName: Demo
+      apName: WordPress
+      epgName: WebServers
+    - nodeID: 101
+      path: eth1/13
+      vlanID: 2013
+      tenantName: Demo
+      apName: WordPress
+      epgName: DbServers
 
   tasks:
 
@@ -373,5 +432,108 @@
                     to_: "{{item.leafId}}"
     with_items:
       "{{swPolicyLeafProfiles}}"
+    loop_control:
+      pause: .5
+
+  - name: Create a New VRF
+    aci_vrf:
+      <<: *apic_info
+      validate_certs: no
+      vrf: "{{item.vrfName}}"
+      tenant: "{{item.tenantName}}"
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+    with_items:
+      "{{vrfs}}"
+    loop_control:
+      pause: .5
+
+  - name: Add Bridge Domain
+    aci_bd:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      bd: "{{item.bdName}}"
+      vrf: "{{item.vrfName}}"
+      state: present
+    with_items:
+      "{{bridgeDomains}}"
+    loop_control:
+      pause: .5
+
+  - name: Create BD Subnet(s)
+    aci_bd_subnet:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      bd: "{{item.bdName}}"
+      gateway: "{{item.gwAddress}}"
+      mask: "{{item.mask}}"
+      state: present
+    with_items:
+      "{{bdSubnets}}"
+    loop_control:
+      pause: .5
+
+  - name: Create New Tenant(s)
+    aci_tenant:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      state: present
+    with_items:
+      "{{tenants}}"
+    loop_control:
+      pause: .5
+
+  - name: Create a New App Profile
+    aci_ap:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      ap: "{{item.apName}}"
+      state: present
+    with_items:
+      "{{appProfiles}}"
+    loop_control:
+      pause: .5
+
+  - name: Create a New EPG
+    aci_epg:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      ap: "{{item.apName}}"
+      epg: "{{item.epgName}}"
+      bd: "{{item.bdName}}"
+      state: present
+    with_items:
+      "{{epgs}}"
+    loop_control:
+      pause: .5
+
+  # Create Static Ports
+  - name:             Create Static Ports
+    aci_rest:
+      <<: *apic_info
+      validate_certs: no
+      use_proxy:      no
+      path:           /api/mo/.json
+      method:         post
+      content:
+        fvRsPathAtt:
+          attributes:
+            annotation: ''
+            descr: ''
+            dn: uni/tn-{{item.tenantName}}/ap-{{item.apName}}/epg-{{item.epgName}}/rspathAtt-[topology/pod-1/paths-{{item.nodeID}}/pathep-[{{item.path}}]]
+            encap: vlan-{{item.vlanID}}
+            instrImedcy: immediate
+            mode: regular
+            primaryEncap: unknown
+            tDn: topology/pod-1/paths-{{item.nodeID}}/pathep-[{{item.path}}]
+            status: created,modified
+    with_items:
+      "{{staticPorts}}"
     loop_control:
       pause: .5
