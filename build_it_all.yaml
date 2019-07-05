@@ -120,6 +120,14 @@
     - Leafs_103_and_104
     - Leafs_105_and_106
 
+    interfaceSelectors:
+    - ifPolicyLeafProfileName: Leafs_101_and_102
+      intf_policy: Linux_Hosts
+      fromCard: '1'
+      fromPort: '1'
+      toCard: '1'
+      toPort: '48'
+
     swPolicyLeafProfiles:
     - swPolicyLeafProfileName: Leaf_101
       leafName: Leaf-101
@@ -401,7 +409,7 @@
           attributes:
             annotation: ''
             descr: ''
-            dn: uni/infra/accportprof-Leafs_101_and_102/hports-interfaces-typ-range
+            dn: uni/infra/accportprof-{{item.ifPolicyLeafProfileName}}/hports-interfaces-typ-range
             name: interfaces
             nameAlias: ''
             ownerKey: ''
@@ -413,17 +421,21 @@
               attributes:
                 annotation: ''
                 fexId: '101'
-                tDn: uni/infra/funcprof/accportgrp-Linux_Hosts
+                tDn: uni/infra/funcprof/accportgrp-{{item.intf_policy}}
           - infraPortBlk:
               attributes:
                 annotation: ''
                 descr: ''
-                fromCard: '1'
-                fromPort: '1'
+                fromCard: "{{item.fromCard}}"
+                fromPort: "{{item.fromPort}}"
                 name: block2
                 nameAlias: ''
-                toCard: '1'
-                toPort: '48'
+                toCard: "{{item.toCard}}"
+                toPort: "{{item.toPort}}"
+    with_items:
+      "{{interfaceSelectors}}"
+    loop_control:
+      pause: .5
 
   # Create Switch Policy Leaf Profiles
   - name:             Create Switch Policy Leaf Profiles
