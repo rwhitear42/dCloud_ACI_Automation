@@ -424,10 +424,6 @@
                 nameAlias: ''
                 toCard: '1'
                 toPort: '48'
-    with_items:
-      "{{ifPolicyLeafProfileNames}}"
-    loop_control:
-      pause: .5
 
   # Create Switch Policy Leaf Profiles
   - name:             Create Switch Policy Leaf Profiles
