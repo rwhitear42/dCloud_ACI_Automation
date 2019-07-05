@@ -388,6 +388,47 @@
     loop_control:
       pause: .5
 
+  # Create Interface Selectors
+  - name:             Create Interface Selectors
+    aci_rest:
+      <<: *apic_info
+      validate_certs: no
+      use_proxy:      no
+      path:           /api/mo/.json
+      method:         post
+      content:
+        infraHPortS:
+          attributes:
+            annotation: ''
+            descr: ''
+            dn: uni/infra/accportprof-Leafs_101_and_102/hports-interfaces-typ-range
+            name: interfaces
+            nameAlias: ''
+            ownerKey: ''
+            ownerTag: ''
+            type: range
+            status: created,modified
+          children:
+          - infraRsAccBaseGrp:
+              attributes:
+                annotation: ''
+                fexId: '101'
+                tDn: uni/infra/funcprof/accportgrp-Linux_Hosts
+          - infraPortBlk:
+              attributes:
+                annotation: ''
+                descr: ''
+                fromCard: '1'
+                fromPort: '1'
+                name: block2
+                nameAlias: ''
+                toCard: '1'
+                toPort: '48'
+    with_items:
+      "{{ifPolicyLeafProfileNames}}"
+    loop_control:
+      pause: .5
+
   # Create Switch Policy Leaf Profiles
   - name:             Create Switch Policy Leaf Profiles
     aci_rest:
@@ -507,6 +548,21 @@
       ap: "{{item.apName}}"
       epg: "{{item.epgName}}"
       bd: "{{item.bdName}}"
+      state: present
+    with_items:
+      "{{epgs}}"
+    loop_control:
+      pause: .5
+
+  - name: Add a new physical domain to EPG binding
+    aci_epg_to_domain:
+      <<: *apic_info
+      validate_certs: no
+      tenant: "{{item.tenantName}}"
+      ap: "{{item.apName}}"
+      epg: "{{item.epgName}}"
+      domain: "{{phys_dom.physDomName}}"
+      domain_type: phys
       state: present
     with_items:
       "{{epgs}}"
