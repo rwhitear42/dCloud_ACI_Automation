@@ -83,7 +83,7 @@
   vars:
     scope:            "context"
     apic_info:        &apic_info
-      host:           "{{ apic }}"
+      host:           "{{ apic_ip }}"
       username:       "{{ apic_username }}"
       password:       "{{ apic_password }}"
     debug_on_state:   "{{ debug_on | default(false) }}"
