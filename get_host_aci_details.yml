@@ -80,7 +80,7 @@
   gather_facts:       no
   vars:
     apic_info:        &apic_info
-      host:           "{{ apic }}"
+      host:           "{{ apic_ip }}"
       username:       "{{ apic_username }}"
       password:       "{{ apic_password }}"
     output_headers  :
