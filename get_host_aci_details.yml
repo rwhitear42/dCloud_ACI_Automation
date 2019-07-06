@@ -75,7 +75,7 @@
 #    terms, this License shall take precedence.
 #
 - name:               Get Tenant, App Profile and EPG for host IP address Playbook
-  hosts:              apic-01.uktme.cisco.com
+  hosts:              apic_simulator
   connection:         local
   gather_facts:       no
   vars:
@@ -89,10 +89,10 @@
     - 'Subject '
     - 'Filter  '
     debug_on_state:   "{{ debug_on | default(false) }}"
-  #vars_prompt:
-  #  - name:           "host_ip_addr"
-  #    prompt:         "Enter Host IP Address"
-  #    private:        no
+  vars_prompt:
+    - name:           "host_ip_addr"
+      prompt:         "Enter Host IP Address"
+      private:        no
   tasks:
 
   # Retrieve the EPG for the host IP specified in host_ip_addr
