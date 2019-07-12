@@ -75,7 +75,7 @@
 #    terms, this License shall take precedence.
 #
 - name:               Get Tenant, App Profile and EPG for host IP address Playbook
-  hosts:              apic_simulator
+  hosts:              apic1.dcloud.cisco.com
   connection:         local
   gather_facts:       no
   vars:

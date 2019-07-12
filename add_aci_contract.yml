@@ -77,7 +77,7 @@
 #    terms, this License shall take precedence.
 #
 - name:               Initial Setup
-  hosts:              apic_simulator
+  hosts:              apic1.dcloud.cisco.com
   connection:         local
   gather_facts:       no
   vars:
