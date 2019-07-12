@@ -76,7 +76,7 @@
 #
 
 - name:               Build APIC Configuration from Scratch
-  hosts:              apic_simulator
+  hosts:              apic1.dcloud.cisco.com
   connection:         local
   gather_facts:       no
   vars:
